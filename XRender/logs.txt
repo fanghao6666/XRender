@@ -1,0 +1,4 @@
+[2023-03-27 21:38:42.280] [file_logger] [info] Hello world!
+[2023-03-27 21:42:56.322] [file_logger] [info] Hello world!
+[2023-03-27 21:43:16.203] [file_logger] [info] Hello world!
+[2023-03-27 21:49:07.964] [file_logger] [error] 1111
