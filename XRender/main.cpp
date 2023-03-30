@@ -7,7 +7,7 @@ using namespace XRender;
 
 int WINAPI WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR commandLine, int showCommand)
 {
-	auto engine = std::make_unique<XRenderEngine>(new XRenderEngine(instance,showCommand));
+	std::unique_ptr<XRenderEngine> engine(new XRenderEngine(instance,showCommand));
 
 	if (!engine->Init())
 	{

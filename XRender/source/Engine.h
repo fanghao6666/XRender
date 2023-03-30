@@ -19,15 +19,15 @@ namespace XRender
 		void					Update();
 		void					Exit();
 
-	protected:
+	private:
 		bool					InitWindow();
 		bool					InitRHI();
 		bool					InitComponent();
+		static LRESULT WINAPI	WndProc(HWND windowHanldle, UINT message, WPARAM wParam, LPARAM lParam);
 
 	private:
 		ComponentPtrArray		mComponents;
 
-	private:
 		Timer					mTimer;
 
 	private:
