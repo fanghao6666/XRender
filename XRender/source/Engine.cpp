@@ -2,29 +2,47 @@
 // XRenderEngine.cpp
 // Created by Haony 2023/3/28
 
-
 #include "Engine.h"
 #include "Log.h"
 #include "Setting.h"
+#include "KeyBoard.h"
+#include "Mouse.h"
+#include "Timer.h"
+#include <dinput.h>
 
 namespace XRender
 {
 
 XRenderEngine::XRenderEngine(HINSTANCE instance,int showCommand)
 	: mInstance(instance), mShowCommand(showCommand),mWindowHandle(),mWindow(),
-	mTimer()
+	mTimer(nullptr),mKeyBoard(nullptr),mMouse(nullptr)
 {
-
+	
 }
 
 XRenderEngine::~XRenderEngine()
 {
+	for (auto& component : mComponents)
+	{
+		if (component)
+		{
+			delete component;
+			component = nullptr;
+		}
+	}
 
+	if (mTimer)
+	{
+		delete mTimer;
+		mTimer = nullptr;
+	}
 }
 
 bool XRenderEngine::Init()
 {
 	Log::Info("Engine Initialization...");
+
+	mTimer = new Timer();
 
 	if (!InitWindow())
 	{
@@ -41,6 +59,12 @@ bool XRenderEngine::Init()
 	if (!InitComponent())
 	{
 		Log::Error("Engine Init Components Failed!");
+		return false;
+	}
+
+	if (!InitScene())
+	{
+		Log::Error("Engine Init Scene Failed!");
 		return false;
 	}
 
@@ -83,13 +107,13 @@ bool XRenderEngine::InitWindow()
 	mWindow.lpszClassName = Setting::WindowClassName.c_str();
 
 	DWORD dwStyle = (WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX);
-	RECT windowRect = { 0,0,static_cast<LONG>(Setting::ScreenWidth),static_cast<LONG>(Setting::ScreenHeight) };
+	RECT windowRect = { 0,0,static_cast<LONG>(Setting::WindowScreenWidth),static_cast<LONG>(Setting::WindowScreenHeight) };
 	AdjustWindowRect(&windowRect, dwStyle, FALSE);
 	
 	RegisterClassEx(&mWindow);
 	int screenWidth = GetSystemMetrics(SM_CXSCREEN);
 	int screenHeight = GetSystemMetrics(SM_CYSCREEN);
-	POINT center = { static_cast<LONG>((screenWidth - Setting::ScreenWidth) / 2),static_cast<LONG>((screenHeight - Setting::ScreenHeight) / 2) };
+	POINT center = { static_cast<LONG>((screenWidth - Setting::WindowScreenWidth) / 2),static_cast<LONG>((screenHeight - Setting::WindowScreenHeight) / 2) };
 	mWindowHandle = CreateWindow(Setting::WindowClassName.c_str(), Setting::WindowTitleName.c_str(),
 		dwStyle, center.x, center.y, windowRect.right - windowRect.left, windowRect.bottom - windowRect.top,
 		nullptr, nullptr, mInstance, nullptr);
@@ -103,10 +127,38 @@ bool XRenderEngine::InitWindow()
 
 bool XRenderEngine::InitRHI()
 {
+	Log::Info("Engine Initialize RHI...");
+
 	return true;
 }
 
 bool XRenderEngine::InitComponent()
+{
+	Log::Info("Engine Initialize Components...");
+
+	// Direct input
+	if (FAILED(DirectInput8Create(mInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (LPVOID*)&mDirectInput, nullptr)))
+	{
+		Log::Error("Initialize DirectInput Failed!");
+		return false;
+
+		mKeyBoard = new KeyBoard(this, mDirectInput);
+		mComponents.push_back(mKeyBoard);
+
+		mMouse = new Mouse(this, mDirectInput);
+		mComponents.push_back(mKeyBoard);
+	}
+
+	bool result = true;
+	for (Component* component : mComponents)
+	{
+		result &= component->Init();
+	}
+
+	return result;
+}
+
+bool XRenderEngine::InitScene()
 {
 	return true;
 }

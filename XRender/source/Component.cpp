@@ -27,9 +27,9 @@ Component::~Component()
 
 }
 
-void Component::Init()
+bool Component::Init()
 {
-
+	return true;
 }
 
 void Component::Update()

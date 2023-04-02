@@ -1,13 +1,10 @@
 #include <windows.h>
-#include <stdlib.h>
 #include "source/Engine.h"
 #include <memory>
 
-using namespace XRender;
-
 int WINAPI WinMain(HINSTANCE instance, HINSTANCE previousInstance, LPSTR commandLine, int showCommand)
 {
-	std::unique_ptr<XRenderEngine> engine(new XRenderEngine(instance,showCommand));
+	std::unique_ptr<XRender::XRenderEngine> engine(new XRender::XRenderEngine(instance,showCommand));
 
 	if (!engine->Init())
 	{

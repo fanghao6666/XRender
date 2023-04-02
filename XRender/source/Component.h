@@ -18,7 +18,7 @@ namespace XRender
 		Component& operator=(const Component& other) = delete;
 		virtual ~Component();
 
-		virtual void	Init();
+		virtual bool	Init();
 		virtual void	Update();
 
 		void			SetEngine(XRenderEngine* engine) { mEngine = engine; }
