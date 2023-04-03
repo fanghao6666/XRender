@@ -10,6 +10,8 @@ namespace XRender
 	class KeyBoard;
 	class Mouse;
 	class Timer;
+	class Camera;
+	class Level;
 
 	class XRenderEngine
 	{
@@ -21,6 +23,8 @@ namespace XRender
 		void					Run();
 		void					Update();
 		void					Exit();
+
+		void					SetLevel(const std::string& levelName);
 
 	public:
 		HINSTANCE				GetInstance() const { return mInstance; }
@@ -34,7 +38,7 @@ namespace XRender
 		bool					InitWindow();
 		bool					InitRHI();
 		bool					InitComponent();
-		bool					InitScene();
+		bool					InitLevel();
 		static LRESULT WINAPI	WndProc(HWND windowHanldle, UINT message, WPARAM wParam, LPARAM lParam);
 
 	private:
@@ -42,8 +46,12 @@ namespace XRender
 		LPDIRECTINPUT8			mDirectInput;
 		KeyBoard*				mKeyBoard;
 		Mouse*					mMouse;
-
+		Camera*					mCamera;
+		Level*					mGameLevel;
 		Timer*					mTimer;
+
+
+		std::string				mCurrentLevel;
 
 	private:
 		HINSTANCE				mInstance;

@@ -19,11 +19,6 @@ Camera::Camera(XRenderEngine* engine)
 	mViewMatrix(), mProjMatrix(),mRotateMatrix(),
 	mKeyBoard(engine->GetKeyBoard()),mMouse(engine->GetMouse())
 {
-	mPosition = Setting::CameraPosition;
-	mDirection = Setting::CameraDirection;
-	mUp = Setting::CameraUp;
-	mRight = Setting::CameraRight;
-
 	mFOV = Setting::CameraFOV;
 	mAspectRatio = Setting::CameraAspectRatio;
 	mNearPlaneDist = Setting::CameraNearPlaneDist;
@@ -41,28 +36,13 @@ Camera::~Camera()
 
 bool Camera::Init()
 {
-	UpdateViewMatrix();
+	Reset();
 	UpdateProjMatrix();
 
 	return true;
 }
 
 void Camera::Update()
-{
-	UpdateViewMatrix();
-	UpdateProjMatrix();
-}
-
-void Camera::UpdateViewMatrix()
-{
-	DirectX::XMVECTOR position = ToDXVector3(mPosition);
-	DirectX::XMVECTOR direction = ToDXVector3(mDirection);
-	DirectX::XMVECTOR up = ToDXVector3(mUp);
-
-	mViewMatrix = DirectX::XMMatrixLookToRH(position, direction, up);
-}
-
-void Camera::UpdateProjMatrix()
 {
 	// process keyboard movement
 	Vector3f movement(0.0f);
@@ -122,7 +102,55 @@ void Camera::UpdateProjMatrix()
 
 	SetRotationMatrix(transRotate);
 
+	UpdateViewMatrix();
+}
+
+void Camera::Reset()
+{
+	mPosition = Vector3f(0, 0, 0);
+	mDirection = Vector3f(0, 0, -1);
+	mUp = Vector3f(0, 1, 0);
+	mRight = Vector3f(1, 0, 0);
+
+	UpdateViewMatrix();
+}
+
+void Camera::UpdateViewMatrix()
+{
+	DirectX::XMVECTOR position = ToDXVector3(mPosition);
+	DirectX::XMVECTOR direction = ToDXVector3(mDirection);
+	DirectX::XMVECTOR up = ToDXVector3(mUp);
+
+	mViewMatrix = DirectX::XMMatrixLookToRH(position, direction, up);
+}
+
+void Camera::UpdateProjMatrix()
+{
 	mProjMatrix = DirectX::XMMatrixPerspectiveFovRH(mFOV, mAspectRatio, mNearPlaneDist, mFarPlaneDist);
+}
+
+void Camera::SetFov(float fov)
+{
+	mFOV = fov;
+	UpdateProjMatrix();
+}
+
+void Camera::SetAspectRation(float ratio)
+{
+	mAspectRatio = ratio;
+	UpdateProjMatrix();
+}
+
+void Camera::SetNearPlaneDist(float distance)
+{
+	mNearPlaneDist = distance;
+	UpdateProjMatrix();
+}
+
+void Camera::SetFarPlaneDist(float distance)
+{
+	mFarPlaneDist = distance;
+	UpdateProjMatrix();
 }
 
 void Camera::SetRotationMatrix(const DirectX::XMMATRIX& matrix)
@@ -144,6 +172,11 @@ void Camera::SetRotationMatrix(const DirectX::XMMATRIX& matrix)
 	mRight = ToVector3(right);
 
 	mRotateMatrix = matrix;
+}
+
+DirectX::XMMATRIX Camera::GetViewProjMatrix() const
+{
+	return DirectX::XMMatrixMultiply(mViewMatrix, mProjMatrix);
 }
 
 }

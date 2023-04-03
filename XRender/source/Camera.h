@@ -20,7 +20,8 @@ namespace XRender
 		
 		virtual bool			Init() override;
 		virtual void			Update() override;
-
+		
+		void					Reset();
 		void					UpdateViewMatrix();
 		void					UpdateProjMatrix();
 	public:
@@ -28,10 +29,10 @@ namespace XRender
 		void					SetDirection(const Vector3f& direction) { mDirection = direction; }
 		void					SetUp(const Vector3f& up) { mUp = up; }
 		void					SetRight(const Vector3f& right) { mRight = right; }
-		void					SetFov(float fov) { mFOV = fov; }
-		void					SetAspectRation(float ratio) { mAspectRatio = ratio; }
-		void					SetNearPlaneDist(float distance) { mNearPlaneDist = distance; }
-		void					SetFarPlaneDist(float distance) { mFarPlaneDist = distance; }
+		void					SetFov(float fov);
+		void					SetAspectRation(float ratio);
+		void					SetNearPlaneDist(float distance);
+		void					SetFarPlaneDist(float distance);
 		void					SetRotationMatrix(const DirectX::XMMATRIX& matrix);
 
 		void					SetMouseSensitivity(float sensitivity) { mMouseSensitivity = sensitivity; }
@@ -48,6 +49,7 @@ namespace XRender
 		float					GetFarPlaneDist() const { return mFarPlaneDist; }
 		DirectX::XMMATRIX		GetViewMatrix() const { return mViewMatrix; }
 		DirectX::XMMATRIX		GetProjMatrix() const { return mProjMatrix; }
+		DirectX::XMMATRIX		GetViewProjMatrix() const;
 		DirectX::XMMATRIX		GetRotateMatrix() const { return mRotateMatrix; }
 
 	private:

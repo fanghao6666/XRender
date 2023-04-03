@@ -8,6 +8,8 @@
 #include "KeyBoard.h"
 #include "Mouse.h"
 #include "Timer.h"
+#include "Camera.h"
+#include "Level.h"
 #include <dinput.h>
 
 namespace XRender
@@ -15,7 +17,7 @@ namespace XRender
 
 XRenderEngine::XRenderEngine(HINSTANCE instance,int showCommand)
 	: mInstance(instance), mShowCommand(showCommand),mWindowHandle(),mWindow(),
-	mTimer(nullptr),mKeyBoard(nullptr),mMouse(nullptr)
+	mTimer(nullptr),mKeyBoard(nullptr),mMouse(nullptr),mCamera(nullptr)
 {
 	
 }
@@ -62,7 +64,7 @@ bool XRenderEngine::Init()
 		return false;
 	}
 
-	if (!InitScene())
+	if (!InitLevel())
 	{
 		Log::Error("Engine Init Scene Failed!");
 		return false;
@@ -87,6 +89,21 @@ void XRenderEngine::Update()
 void XRenderEngine::Exit()
 {
 
+}
+
+void XRenderEngine::SetLevel(const std::string& level)
+{
+	mCurrentLevel = level;
+	mCamera->Reset();
+	if (mGameLevel != nullptr)
+	{
+		delete mGameLevel;
+		mGameLevel = nullptr;
+	}
+
+	mGameLevel = new Level(this, level);
+	mGameLevel->Init();
+	mComponents.push_back(mGameLevel);
 }
 
 bool XRenderEngine::InitWindow()
@@ -149,6 +166,9 @@ bool XRenderEngine::InitComponent()
 		mComponents.push_back(mKeyBoard);
 	}
 
+	mCamera = new Camera(this);
+	mComponents.push_back(mCamera);
+
 	bool result = true;
 	for (Component* component : mComponents)
 	{
@@ -158,8 +178,10 @@ bool XRenderEngine::InitComponent()
 	return result;
 }
 
-bool XRenderEngine::InitScene()
+bool XRenderEngine::InitLevel()
 {
+	SetLevel(Setting::LevelStartSceneName);
+
 	return true;
 }
 
